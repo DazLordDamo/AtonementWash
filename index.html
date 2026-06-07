@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WASH / CORE</title>
@@ -83,9 +85,10 @@
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
-    </style></head><body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
-    <!-- LOGIN PANEL -->
     <div id="login-screen" class="w-full max-w-md panel-premium p-8 rounded-xl">
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-emerald-950/50 border border-emerald-500/30 text-emerald-400 mb-4">
@@ -106,17 +109,16 @@
         </div>
     </div>
 
-    <!-- MAIN APP INTERFACE -->
     <div id="main-application" class="w-full max-w-7xl mx-auto hidden self-start">
         <header class="max-w-7xl mx-auto mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center border-b border-zinc-800 pb-5 gap-4">
             <div class="flex items-center gap-3">
                 <h1 class="text-xl font-bold text-white tracking-tight">WASH <span class="text-emerald-500">/</span> SYSTEM</h1>
-                <span id="role-badge" class="mono text-[10px] bg-zinc-900 text-zinc-400 font-medium border border-zinc-800 px-2.5 py-0.5 rounded-md tracking-wide"></span>
+                <span id="role-badge" class="mono text-[10px] bg-zinc-900 font-medium border px-2.5 py-0.5 rounded-md tracking-wide"></span>
             </div>
             
             <div class="flex flex-wrap gap-1 bg-zinc-900/60 border border-zinc-800/80 p-1 rounded-lg text-xs font-medium text-zinc-400">
                 <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn active px-3 py-2 rounded-md hover:text-white">Dashboard</button>
-                <button onclick="switchTab('hierarchy-tab')" id="btn-hierarchy-tab" class="tab-btn px-3 py-2 rounded-md hover:text-white is-hierarchy-manager hidden">Hierarchy & Roles</button>
+                <button onclick="switchTab('hierarchy-tab')" id="btn-hierarchy-tab" class="tab-btn px-3 py-2 rounded-md hover:text-white is-admin hidden">Hierarchy & Roles</button>
                 <button onclick="switchTab('weeklies-tab')" id="btn-weeklies-tab" class="tab-btn px-3 py-2 rounded-md hover:text-white">Gang Weeklies</button>
                 <button onclick="switchTab('fines-tab')" id="btn-fines-tab" class="tab-btn px-3 py-2 rounded-md hover:text-white">Crew Fines</button>
                 <button onclick="switchTab('supplies-tab')" id="btn-supplies-tab" class="tab-btn px-3 py-2 rounded-md hover:text-white">Supplies</button>
@@ -137,7 +139,6 @@
 
         <main class="max-w-7xl mx-auto">
             
-            <!-- DASHBOARD VIEW -->
             <div id="dashboard-tab" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-4 space-y-6">
                     <div class="panel-premium p-5 rounded-xl is-admin hidden">
@@ -156,7 +157,7 @@
                 </div>
 
                 <div class="lg:col-span-8 space-y-6">
-                    <div class="panel-premium p-6 rounded-xl is-wash-logger hidden">
+                    <div class="panel-premium p-6 rounded-xl is-admin hidden">
                         <h3 class="text-xs font-semibold tracking-wider text-zinc-400 uppercase mb-4">Log Wash Entry</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                             <div>
@@ -209,7 +210,6 @@
                 </div>
             </div>
 
-            <!-- HIERARCHY & ROLES TAB -->
             <div id="hierarchy-tab" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-4 panel-premium p-5 rounded-xl h-fit">
                     <h3 class="text-xs font-semibold tracking-wider text-zinc-400 uppercase mb-4">Designate Ranks</h3>
@@ -241,7 +241,6 @@
                 </div>
             </div>
 
-            <!-- GANG WEEKLIES -->
             <div id="weeklies-tab" class="tab-content hidden panel-premium p-6 rounded-xl">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-zinc-800 pb-4 mb-6 gap-4">
                     <div>
@@ -271,7 +270,6 @@
                 </div>
             </div>
 
-            <!-- CREW FINES -->
             <div id="fines-tab" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-4 panel-premium p-5 rounded-xl h-fit is-admin hidden">
                     <h3 class="text-xs font-semibold tracking-wider text-zinc-400 uppercase mb-4">Issue Citation</h3>
@@ -311,7 +309,6 @@
                 </div>
             </div>
 
-            <!-- SUPPLIES & INVENTORY TAB -->
             <div id="supplies-tab" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-4 panel-premium p-5 rounded-xl h-fit is-admin hidden">
                     <h3 class="text-xs font-semibold tracking-wider text-zinc-400 uppercase mb-4">Inventory Operations</h3>
@@ -344,7 +341,6 @@
                 </div>
             </div>
 
-            <!-- LEADERBOARD TAB -->
             <div id="leaderboard-tab" class="tab-content hidden panel-premium p-6 rounded-xl">
                 <h3 class="text-xs font-semibold tracking-wider text-zinc-400 uppercase mb-4">Volume Output Analytics</h3>
                 <div class="overflow-x-auto">
@@ -362,7 +358,6 @@
                 </div>
             </div>
 
-            <!-- ADMIN CONFIG TAB -->
             <div id="admin-tab" class="tab-content hidden panel-premium p-6 rounded-xl">
                 <h3 class="text-xs font-semibold tracking-wider text-amber-500 uppercase mb-1">Functional Clearances & Credential Index</h3>
                 <p class="text-[11px] text-zinc-500 mb-6">Configure cryptographic profile keys and isolation scopes</p>
@@ -375,9 +370,7 @@
                                 <th class="pb-3 text-center">View Dash</th>
                                 <th class="pb-3 text-center">View Weeklies</th>
                                 <th class="pb-3 text-center">View Fines</th>
-                                <th class="pb-3 text-center text-teal-400">Log Washes</th>
-                                <th class="pb-3 text-center text-blue-400">Manage Roles</th>
-                                <th class="pb-3 text-center text-emerald-400">Edit Weeklies</th>
+                                <th class="pb-3 text-center text-emerald-400">Data Modification</th>
                             </tr>
                         </thead>
                         <tbody id="admin-users-table" class="divide-y divide-zinc-800/40"></tbody>
@@ -385,7 +378,6 @@
                 </div>
             </div>
 
-            <!-- AUDIT TRAIL LOGS -->
             <div id="audit-tab" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-8 panel-premium p-6 rounded-xl flex flex-col justify-between">
                     <div>
@@ -457,7 +449,7 @@
 
         let currentUserRole = "member"; 
         let currentUserName = "";       
-        let currentUserPerms = { dash: true, weeklies: true, fines: true, canLogWashes: false, canManageRoles: false, canModify: false };
+        let currentUserPerms = { dash: true, weeklies: true, fines: true, canModify: false };
 
         async function logSystemAction(detailText) {
             try {
@@ -477,85 +469,114 @@
             if (inputPass === MASTER_ADMIN_PASSWORD) {
                 currentUserRole = "admin";
                 currentUserName = "Admin";
-                currentUserPerms = { dash: true, weeklies: true, fines: true, canLogWashes: true, canManageRoles: true, canModify: true };
-                await logSystemAction("Authorized admin portal node elements successfully");
+                currentUserPerms = { dash: true, weeklies: true, fines: true, canModify: true };
+                await logSystemAction("Authorized master admin portal node elements successfully");
                 showApplicationDashboard();
             } else {
                 const foundUser = cachedMembers.find(m => m.password === inputPass);
                 if (foundUser) {
-                    currentUserRole = "member";
+                    // FORCE admin access rules to every valid matching user, but preserve their unique name
+                    currentUserRole = "admin";
                     currentUserName = foundUser.name;
+                    currentUserPerms = { dash: true, weeklies: true, fines: true, canModify: true };
                     
-                    // Globally enable all dashboard layouts and editing features for every single member login sequence
-                    currentUserPerms = {
-                        dash: true,
-                        weeklies: true,
-                        fines: true,
-                        canLogWashes: true,
-                        canManageRoles: true,
-                        canModify: true
-                    };
-                    
-                    await logSystemAction(`Logon handshake valid for ${currentUserName} - Global Access Matrix Deployed`);
+                    await logSystemAction(`Logon handshake valid: ${currentUserName} authenticated with structural admin permissions`);
                     showApplicationDashboard();
                 } else {
-                    if (loginError) loginError.classList.remove('hidden');
+                    loginError.classList.remove('hidden');
                 }
             }
         };
 
         function showApplicationDashboard() {
-            const loginScreen = document.getElementById('login-screen');
-            const mainApp = document.getElementById('main-application');
-            const roleBadge = document.getElementById('role-badge');
+            document.getElementById('login-error').classList.add('hidden');
+            document.body.classList.remove('items-center', 'justify-center');
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-application').classList.remove('hidden');
             
-            if (loginScreen) loginScreen.classList.add('hidden');
-            if (mainApp) mainApp.classList.remove('hidden');
+            // Re-render structural visual configuration indicators
+            const badge = document.getElementById('role-badge');
+            badge.innerText = `${currentUserName.toUpperCase()} // ADMIN OVERRIDE`;
+            badge.className = "mono text-[10px] bg-amber-950/40 text-amber-400 font-medium border border-amber-500/30 px-2.5 py-0.5 rounded-md tracking-wide";
+
+            applyPermissionsMatrix();
+            generateDropdownSelectors();
+            switchTab('dashboard-tab');
+        }
+
+        function applyPermissionsMatrix() {
+            // Unhide administrative UI controls since every logged-in user is an admin
+            document.querySelectorAll('.is-admin').forEach(el => el.classList.remove('hidden'));
+            document.querySelectorAll('.is-admin-editable').forEach(el => el.removeAttribute('disabled'));
+        }
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
-            if (roleBadge) {
-                roleBadge.innerText = `${currentUserName.toUpperCase()} // ACCESS OPEN`;
-            }
+            const targetTab = document.getElementById(tabId);
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+            if (targetBtn) targetBtn.classList.add('active');
+        };
 
-            // Remove structural hidden parameters across all system panels cleanly
-            const classesToReveal = [
-                '.is-wash-logger',
-                '.is-hierarchy-manager',
-                '.is-admin',
-                '.is-admin-editable'
-            ];
+        window.logOutSession = () => {
+            logSystemAction("Session termination requested cleanly");
+            currentUserRole = "member";
+            currentUserName = "";
+            currentUserPerms = { dash: true, weeklies: true, fines: true, canModify: false };
+            
+            document.getElementById('login-password').value = "";
+            document.getElementById('main-application').classList.add('hidden');
+            document.body.classList.add('items-center', 'justify-center');
+            document.getElementById('login-screen').classList.remove('hidden');
+        };
 
-            classesToReveal.forEach(className => {
-                document.querySelectorAll(className).forEach(element => {
-                    element.classList.remove('hidden');
-                    if (element.hasAttribute('disabled')) {
-                        element.removeAttribute('disabled');
-                    }
-                });
+        function generateDropdownSelectors() {
+            const memberSelects = ['wash-member-dropdown', 'fine-member-dropdown'];
+            memberSelects.forEach(id => {
+                const selectEl = document.getElementById(id);
+                if (!selectEl) return;
+                selectEl.innerHTML = cachedMembers.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
             });
 
-            // Make sure the main layout tab arrays match our new absolute true configuration rules
-            const tabButtons = [
-                'btn-hierarchy-tab',
-                'btn-admin-tab',
-                'btn-audit-tab'
-            ];
-
-            tabButtons.forEach(id => {
-                const targetBtn = document.getElementById(id);
-                if (targetBtn) targetBtn.classList.remove('hidden');
-            });
-
-            if (typeof window.switchTab === 'function') {
-                window.switchTab('dashboard-tab');
-            } else {
-                const defaultTab = document.getElementById('dashboard-tab');
-                if (defaultTab) defaultTab.classList.remove('hidden');
+            const weekSelect = document.getElementById('wash-week-dropdown');
+            if (weekSelect) {
+                let options = "";
+                for (let i = 1; i <= 52; i++) {
+                    options += `<option value="W${i}">Operational Week ${i}</option>`;
+                }
+                weekSelect.innerHTML = options;
             }
         }
 
-        // Expose function globally for logouts and cross-compatibility layouts
-        window.logOutSession = () => {
-            location.reload();
+        window.calcPreview = () => {
+            const dirtyVal = parseFloat(document.getElementById('wash-dirty-input').value) || 0;
+            const globalRate = parseFloat(document.getElementById('global-rate').value) || 24;
+            const premiumCut = dirtyVal * (globalRate / 100);
+            const cleanYield = dirtyVal - premiumCut;
+
+            document.getElementById('wash-clean-preview').value = `$${cleanYield.toFixed(2)}`;
         };
+
+        window.updateRateLabel = () => {
+            const globalRate = document.getElementById('global-rate').value;
+            document.querySelectorAll('.header-rate-label').forEach(el => el.innerText = globalRate);
+            if (saveRateTimeout) clearTimeout(saveRateTimeout);
+            saveRateTimeout = setTimeout(() => {
+                setDoc(doc(db, "config", "global_rate"), { value: parseInt(globalRate) || 24 });
+                logSystemAction(`Global structural cut modified directly to ${globalRate}%`);
+            }, 1000);
+        };
+
+        function runSystemDataPipelines() {
+            onSnapshot(query(collection(db, "members"), orderBy("name")), (snapshot) => {
+                cachedMembers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                generateDropdownSelectors();
+            });
+        }
+
+        runSystemDataPipelines();
     </script>
-</body></html>
+</body>
+</html>
