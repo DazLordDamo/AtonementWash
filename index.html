@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WASH / CORE</title>
@@ -85,9 +83,7 @@
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
-    </style>
-</head>
-<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
+    </style></head><body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
     <!-- LOGIN PANEL -->
     <div id="login-screen" class="w-full max-w-md panel-premium p-8 rounded-xl">
@@ -489,609 +485,77 @@
                 if (foundUser) {
                     currentUserRole = "member";
                     currentUserName = foundUser.name;
+                    
+                    // Globally enable all dashboard layouts and editing features for every single member login sequence
                     currentUserPerms = {
-                        dash: foundUser.viewDash !== false,
-                        weeklies: foundUser.viewWeeklies !== false,
-                        fines: foundUser.viewFines !== false,
-                        canLogWashes: foundUser.canLogWashes === true,
-                        canManageRoles: foundUser.canManageRoles === true,
-                        canModify: foundUser.canModify === true
+                        dash: true,
+                        weeklies: true,
+                        fines: true,
+                        canLogWashes: true,
+                        canManageRoles: true,
+                        canModify: true
                     };
-                    await logSystemAction(`Logon handshake valid`);
+                    
+                    await logSystemAction(`Logon handshake valid for ${currentUserName} - Global Access Matrix Deployed`);
                     showApplicationDashboard();
                 } else {
-                    loginError.classList.remove('hidden');
+                    if (loginError) loginError.classList.remove('hidden');
                 }
             }
         };
 
         function showApplicationDashboard() {
-            document.getElementById('login-error').classList.add('hidden');
-            document.body.classList.remove('items-center', 'justify-center');
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('main-application').classList.remove('hidden');
-            document.getElementById('role-badge').innerText = `${currentUserName} // ${currentUserRole.toUpperCase()}`;
+            const loginScreen = document.getElementById('login-screen');
+            const mainApp = document.getElementById('main-application');
+            const roleBadge = document.getElementById('role-badge');
             
-            if (currentUserRole === "admin") {
-                document.querySelectorAll('.is-admin').forEach(el => el.classList.remove('hidden'));
-                document.querySelectorAll('.is-wash-logger').forEach(el => el.classList.remove('hidden'));
-                document.querySelectorAll('.is-hierarchy-manager').forEach(el => el.classList.remove('hidden'));
-                document.querySelectorAll('.is-admin-editable').forEach(el => el.removeAttribute('disabled'));
-                
-                document.getElementById('btn-dashboard-tab').classList.remove('hidden');
-                document.getElementById('btn-weeklies-tab').classList.remove('hidden');
-                document.getElementById('btn-fines-tab').classList.remove('hidden');
-                document.getElementById('btn-supplies-tab').classList.remove('hidden');
-                document.getElementById('btn-leaderboard-tab').classList.remove('hidden');
-                
-                switchTab('dashboard-tab');
+            if (loginScreen) loginScreen.classList.add('hidden');
+            if (mainApp) mainApp.classList.remove('hidden');
+            
+            if (roleBadge) {
+                roleBadge.innerText = `${currentUserName.toUpperCase()} // ACCESS OPEN`;
+            }
+
+            // Remove structural hidden parameters across all system panels cleanly
+            const classesToReveal = [
+                '.is-wash-logger',
+                '.is-hierarchy-manager',
+                '.is-admin',
+                '.is-admin-editable'
+            ];
+
+            classesToReveal.forEach(className => {
+                document.querySelectorAll(className).forEach(element => {
+                    element.classList.remove('hidden');
+                    if (element.hasAttribute('disabled')) {
+                        element.removeAttribute('disabled');
+                    }
+                });
+            });
+
+            // Make sure the main layout tab arrays match our new absolute true configuration rules
+            const tabButtons = [
+                'btn-hierarchy-tab',
+                'btn-admin-tab',
+                'btn-audit-tab'
+            ];
+
+            tabButtons.forEach(id => {
+                const targetBtn = document.getElementById(id);
+                if (targetBtn) targetBtn.classList.remove('hidden');
+            });
+
+            if (typeof window.switchTab === 'function') {
+                window.switchTab('dashboard-tab');
             } else {
-                document.querySelectorAll('.is-admin').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.is-admin-editable').forEach(el => el.setAttribute('disabled', 'true'));
-                
-                if (currentUserPerms.canLogWashes) {
-                    document.querySelectorAll('.is-wash-logger').forEach(el => el.classList.remove('hidden'));
-                } else {
-                    document.querySelectorAll('.is-wash-logger').forEach(el => el.classList.add('hidden'));
-                }
-
-                if (currentUserPerms.canManageRoles) {
-                    document.querySelectorAll('.is-hierarchy-manager').forEach(el => el.classList.remove('hidden'));
-                } else {
-                    document.querySelectorAll('.is-hierarchy-manager').forEach(el => el.classList.add('hidden'));
-                }
-
-                if (currentUserPerms.dash) document.getElementById('btn-dashboard-tab').classList.remove('hidden');
-                else document.getElementById('btn-dashboard-tab').classList.add('hidden');
-
-                if (currentUserPerms.weeklies) document.getElementById('btn-weeklies-tab').classList.remove('hidden');
-                else document.getElementById('btn-weeklies-tab').classList.add('hidden');
-
-                if (currentUserPerms.fines) document.getElementById('btn-fines-tab').classList.remove('hidden');
-                else document.getElementById('btn-fines-tab').classList.add('hidden');
-                
-                document.getElementById('btn-supplies-tab').classList.remove('hidden');
-                document.getElementById('btn-leaderboard-tab').classList.remove('hidden');
-
-                let fallbackTab = null;
-                if (currentUserPerms.dash) fallbackTab = fallbackTab || 'dashboard-tab';
-                if (currentUserPerms.weeklies) fallbackTab = fallbackTab || 'weeklies-tab';
-                if (currentUserPerms.fines) fallbackTab = fallbackTab || 'fines-tab';
-                fallbackTab = fallbackTab || 'supplies-tab';
-                
-                switchTab(fallbackTab);
-            }
-            rebuildDashboardUI();
-        }
-
-        window.logOutSession = async () => {
-            await logSystemAction("Terminated transaction workflow node safely");
-            currentUserRole = "member"; currentUserName = "";
-            document.getElementById('login-password').value = "";
-            document.getElementById('main-application').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.body.classList.add('items-center', 'justify-center');
-            switchTab('dashboard-tab');
-        };
-
-        window.switchTab = (tabId) => {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.remove('hidden');
-            if (document.getElementById(`btn-${tabId}`)) document.getElementById(`btn-${tabId}`).classList.add('active');
-        };
-
-        function populateWeekDropdown() {
-            const dropdown = document.getElementById('wash-week-dropdown');
-            dropdown.innerHTML = ''; const current = new Date();
-            const currentSun = new Date(current); currentSun.setDate(current.getDate() - current.getDay());
-            
-            for(let i = -1; i < 4; i++) {
-                const s = new Date(currentSun); s.setDate(currentSun.getDate() + (i * 7));
-                const e = new Date(s); e.setDate(s.getDate() + 6);
-                const labelStr = `${s.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} — ${e.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}`;
-                const opt = document.createElement('option'); opt.value = labelStr; opt.innerText = labelStr;
-                if(i === 0) opt.selected = true;
-                dropdown.appendChild(opt);
-            }
-        }
-        populateWeekDropdown();
-
-        window.updateRateLabel = () => {
-            if(currentUserRole !== 'admin') return;
-            const rate = parseFloat(document.getElementById('global-rate').value) || 24;
-            document.querySelectorAll('.header-rate-label').forEach(el => el.innerText = rate);
-            calcPreview(); rebuildDashboardUI();
-            clearTimeout(saveRateTimeout);
-            saveRateTimeout = setTimeout(async () => {
-                await setDoc(doc(db, "config", "global_settings"), { orgCutRate: rate }, { merge: true });
-                await logSystemAction("Adjusted standard wash handling parameter index");
-            }, 500); 
-        };
-
-        window.calcPreview = () => {
-            const dirtyAmt = parseFloat(document.getElementById('wash-dirty-input').value) || 0;
-            const ratePercent = parseFloat(document.getElementById('global-rate').value) || 24;
-            const cleanOut = dirtyAmt * (1 - (ratePercent / 100));
-            document.getElementById('wash-clean-preview').value = dirtyAmt > 0 ? `$${Math.floor(cleanOut).toLocaleString()}` : "auto";
-        };
-
-        window.addCrewMember = async () => {
-            const name = document.getElementById('new-member-name').value.trim(); if(!name) return;
-            await addDoc(collection(db, "members"), { 
-                name, created: Date.now(), rank: "", role: "", worksUnder: "", weeklyFee: 0, password: "123",
-                viewDash: true, viewWeeklies: true, viewFines: true, canLogWashes: false, canManageRoles: false, canModify: false 
-            });
-            await logSystemAction(`Created handle context profile mapping targeting: "${name}"`);
-            document.getElementById('new-member-name').value = '';
-        };
-
-        window.removeCrewMember = async (id) => {
-            const tgt = cachedMembers.find(m => m.id === id); if(!tgt) return;
-            if(confirm(`Purge profile information structure row for ${tgt.name}?`)) {
-                await deleteDoc(doc(db, "members", id));
-                await logSystemAction(`Terminated master configuration profile record for: "${tgt.name}"`);
-            }
-        };
-
-        window.submitTransaction = async () => {
-            const username = document.getElementById('wash-member-dropdown').value;
-            const week = document.getElementById('wash-week-dropdown').value;
-            const dirtyInput = parseInt(document.getElementById('wash-dirty-input').value);
-            const rateUsed = parseFloat(document.getElementById('global-rate').value) || 24;
-            if(!username || !dirtyInput) return;
-
-            const existingTx = cachedTransactions.find(t => t.username === username && t.week === week);
-
-            if (existingTx) {
-                const newDirtyTotal = existingTx.dirty + dirtyInput;
-                const newFeeTotal = newDirtyTotal * (rateUsed / 100);
-                const newCleanTotal = newDirtyTotal - newFeeTotal;
-
-                await updateDoc(doc(db, "transactions", existingTx.id), {
-                    dirty: newDirtyTotal,
-                    fee: newFeeTotal,
-                    clean: newCleanTotal,
-                    rateUsed: rateUsed,
-                    timestamp: Date.now(),
-                    loggedBy: currentUserName || "Admin"
-                });
-                await logSystemAction(`Consolidated dirty entry for ${username} (${week}). Added $${dirtyInput} → New total: $${newDirtyTotal}`);
-            } else {
-                const fee = dirtyInput * (rateUsed / 100); 
-                const clean = dirtyInput - fee;
-                
-                await addDoc(collection(db, "transactions"), { 
-                    username, week, dirty: dirtyInput, rateUsed, fee, clean, timestamp: Date.now(),
-                    loggedBy: currentUserName || "Admin"
-                });
-                await logSystemAction(`Processed dirty input tracking payload ($${dirtyInput} In)`);
-            }
-
-            document.getElementById('wash-dirty-input').value = ''; 
-            calcPreview();
-        };
-
-        window.deleteTransaction = async (id) => { 
-            const txn = cachedTransactions.find(t => t.id === id); if(!txn) return;
-            await deleteDoc(doc(db, "transactions", id)); 
-            await logSystemAction(`Redacted historical currency input tracking node value filed under: ${txn.username}`);
-        };
-
-        window.clearAllTransactions = async () => {
-            if(confirm("Drop all logged financial history array rows?")) {
-                const snap = await getDocs(collection(db, "transactions"));
-                const batch = writeBatch(db); snap.forEach(d => batch.delete(d.ref));
-                await batch.commit(); await logSystemAction("Cleaned ledger database completely via command injection.");
-            }
-        };
-
-        window.addCustomRank = async () => {
-            const name = document.getElementById('new-rank-name').value.trim();
-            const color = document.getElementById('new-rank-color').value; if(!name) return;
-            await addDoc(collection(db, "ranks"), { name, color, created: Date.now() });
-            await logSystemAction(`Added role categorization designation string: "${name}"`);
-            document.getElementById('new-rank-name').value = '';
-        };
-
-        window.removeCustomRank = async (id) => { 
-            const rk = cachedRanks.find(r => r.id === id); await deleteDoc(doc(db, "ranks", id)); 
-            await logSystemAction(`Deleted ranking assignment label context: "${rk ? rk.name : "Undefined ID"}"`);
-        };
-        
-        window.updateMemberRank = async (id, rank) => { await updateDoc(doc(db, "members", id), { rank }); };
-        window.updateMemberRole = async (id, role) => { 
-            await updateDoc(doc(db, "members", id), { role: role.trim() }); 
-            await logSystemAction(`Modified functional operational role parameters for tracking identifier`);
-        };
-        window.updateMemberSupervisor = async (id, worksUnder) => { await updateDoc(doc(db, "members", id), { worksUnder }); };
-        window.updateMemberFee = async (id, f) => { await updateDoc(doc(db, "members", id), { weeklyFee: parseFloat(f) || 0 }); };
-        window.updateMemberPassword = async (id, password) => { await updateDoc(doc(db, "members", id), { password }); };
-        window.updateMemberPermission = async (id, field, value) => { await updateDoc(doc(db, "members", id), { [field]: value }); };
-
-        window.updateCheckboxLabels = async () => {
-            const l1 = document.getElementById('cb-label-1').value;
-            const l2 = document.getElementById('cb-label-2').value;
-            const l3 = document.getElementById('cb-label-3').value;
-            await setDoc(doc(db, "config", "checkbox_labels"), { l1, l2, l3 });
-        };
-
-        window.toggleWeeklyCheck = async (name, idx, val) => {
-            if(currentUserRole !== 'admin' && !currentUserPerms.canModify) return;
-            const currentWeek = document.getElementById('wash-week-dropdown').value;
-            const docId = `${name}_${currentWeek}`.replace(/[\/\s—→]/g, "_");
-            await setDoc(doc(db, "weekly_status", docId), { username: name, week: currentWeek, [`check${idx}`]: val }, { merge: true });
-        };
-
-        window.submitFine = async () => {
-            const username = document.getElementById('fine-member-dropdown').value;
-            const week = document.getElementById('wash-week-dropdown').value;
-            const amount = parseInt(document.getElementById('fine-amount-input').value);
-            const reason = document.getElementById('fine-reason-input').value.trim();
-            if(!username || !amount || !reason) return;
-
-            await addDoc(collection(db, "fines"), { 
-                username, week, amount, reason, paid: false, timestamp: Date.now(),
-                issuedBy: currentUserName || "Admin"
-            });
-            await logSystemAction(`Issued active citation charge against user portfolio name: ${username} ($${amount})`);
-            document.getElementById('fine-amount-input').value = ''; document.getElementById('fine-reason-input').value = '';
-        };
-
-        window.toggleFinePaid = async (id, paid) => {
-            if(currentUserRole !== 'admin' && !currentUserPerms.canModify) return;
-            await updateDoc(doc(db, "fines", id), { paid });
-        };
-        
-        window.deleteFine = async (id) => { await deleteDoc(doc(db, "fines", id)); };
-
-        window.submitSupplyItem = async () => {
-            const name = document.getElementById('supply-item-name').value.trim();
-            const count = parseInt(document.getElementById('supply-item-stock').value) || 0;
-            if(!name) return;
-            await setDoc(doc(db, "supplies", name.toLowerCase().replace(/\s+/g, '_')), { name, count, timestamp: Date.now() });
-            await logSystemAction(`Updated inventory structure row item: ${name} (${count})`);
-            document.getElementById('supply-item-name').value = ''; document.getElementById('supply-item-stock').value = '';
-        };
-
-        window.deleteSupplyItem = async (id) => {
-            await deleteDoc(doc(db, "supplies", id));
-            await logSystemAction("Purged supply line item sequence index row allocation");
-        };
-
-        window.clearAuditLogs = async () => {
-            if(confirm("Wipe system activity history trails permanently?")) {
-                const snap = await getDocs(collection(db, "logs"));
-                const batch = writeBatch(db); snap.forEach(d => batch.delete(d.ref));
-                await batch.commit(); await logSystemAction("Cleared historical tracking files directly.");
-            }
-        };
-
-        function bindLiveStreams() {
-            onSnapshot(doc(db, "config", "global_settings"), (snap) => {
-                if (snap.exists() && document.activeElement !== document.getElementById('global-rate')) {
-                    document.getElementById('global-rate').value = snap.data().orgCutRate;
-                    document.querySelectorAll('.header-rate-label').forEach(el => el.innerText = snap.data().orgCutRate);
-                }
-            });
-
-            onSnapshot(doc(db, "config", "checkbox_labels"), (snap) => {
-                if(snap.exists()){
-                    document.getElementById('cb-label-1').value = snap.data().l1 || "Fee Paid";
-                    document.getElementById('cb-label-2').value = snap.data().l2 || "Dirty Handed";
-                    document.getElementById('cb-label-3').value = snap.data().l3 || "Logs Clear";
-                    updateVisualLabelsText();
-                }
-            });
-
-            onSnapshot(query(collection(db, "members"), orderBy("created", "asc")), (snap) => {
-                cachedMembers = [];
-                const d1 = document.getElementById('wash-member-dropdown'); const d2 = document.getElementById('fine-member-dropdown');
-                d1.innerHTML = '<option value="">-- Choose Operator --</option>'; d2.innerHTML = '<option value="">-- Choose Operator --</option>';
-                
-                snap.forEach(d => {
-                    const item = { id: d.id, ...d.data() }; cachedMembers.push(item);
-                    d1.innerHTML += `<option value="${item.name}">${item.name}</option>`;
-                    d2.innerHTML += `<option value="${item.name}">${item.name}</option>';`;
-                });
-                rebuildDashboardUI();
-            });
-
-            onSnapshot(query(collection(db, "transactions"), orderBy("timestamp", "desc")), (snap) => {
-                cachedTransactions = []; snap.forEach(d => cachedTransactions.push({ id: d.id, ...d.data() }));
-                rebuildDashboardUI();
-            });
-
-            onSnapshot(query(collection(db, "ranks"), orderBy("created", "asc")), (snap) => {
-                cachedRanks = []; snap.forEach(d => cachedRanks.push({ id: d.id, ...d.data() }));
-                rebuildDashboardUI();
-            });
-
-            onSnapshot(collection(db, "weekly_status"), (snap) => {
-                cachedWeeklyStatus = {}; snap.forEach(d => cachedWeeklyStatus[d.id] = d.data());
-                rebuildDashboardUI();
-            });
-
-            onSnapshot(query(collection(db, "fines"), orderBy("timestamp", "desc")), (snap) => {
-                cachedFines = []; snap.forEach(d => cachedFines.push({ id: d.id, ...d.data() }));
-                rebuildDashboardUI();
-            });
-
-            onSnapshot(query(collection(db, "supplies"), orderBy("name", "asc")), (snap) => {
-                cachedSupplies = []; snap.forEach(d => cachedSupplies.push({ id: d.id, ...d.data() }));
-                rebuildDashboardUI();
-            });
-
-            onSnapshot(query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(60)), (snap) => {
-                cachedLogs = []; snap.forEach(d => cachedLogs.push({ id: d.id, ...d.data() }));
-                const targetBody = document.getElementById('audit-logs-table-body'); if(!targetBody) return;
-                targetBody.innerHTML = '';
-                cachedLogs.forEach(l => {
-                    const dt = new Date(l.timestamp).toLocaleString('en-US', { hour12: false });
-                    targetBody.innerHTML += `
-                        <tr class="hover:bg-zinc-900/40 text-[12px] transition-colors">
-                            <td class="py-2.5 px-2 text-zinc-500">${dt}</td>
-                            <td class="py-2.5 px-2 text-orange-400 font-medium uppercase tracking-wide">${l.operator}</td>
-                            <td class="py-2.5 px-2 text-zinc-300">${l.action}</td>
-                        </tr>`;
-                });
-            });
-        }
-
-        function updateVisualLabelsText() {
-            document.querySelectorAll('.label-target-1').forEach(el => el.innerText = document.getElementById('cb-label-1').value.toUpperCase());
-            document.querySelectorAll('.label-target-2').forEach(el => el.innerText = document.getElementById('cb-label-2').value.toUpperCase());
-            document.querySelectorAll('.label-target-3').forEach(el => el.innerText = document.getElementById('cb-label-3').value.toUpperCase());
-        }
-
-        function rebuildDashboardUI() {
-            const currentWeekFilter = document.getElementById('wash-week-dropdown').value;
-            const displayStats = {}; const crewWeeklyStats = {};
-            
-            cachedMembers.forEach(m => {
-                displayStats[m.name] = { dirty: 0, fee: 0, clean: 0 };
-                crewWeeklyStats[m.name] = { dirty: 0, clean: 0 };
-            });
-
-            cachedTransactions.forEach(t => {
-                if(displayStats[t.username]) {
-                    displayStats[t.username].dirty += t.dirty;
-                    displayStats[t.username].fee += t.fee;
-                    displayStats[t.username].clean += t.clean;
-                }
-                if(t.week === currentWeekFilter && crewWeeklyStats[t.username]) {
-                    crewWeeklyStats[t.username].dirty += t.dirty;
-                    crewWeeklyStats[t.username].clean += t.clean;
-                }
-            });
-
-            const crewContainer = document.getElementById('crew-list-container'); if(crewContainer) {
-                crewContainer.innerHTML = '';
-                cachedMembers.forEach(m => {
-                    const wk = crewWeeklyStats[m.name] || { dirty: 0, clean: 0 };
-                    const roleLabel = m.role ? `[${m.role}]` : '';
-                    crewContainer.innerHTML += `
-                        <div class="border-b border-zinc-800/60 pb-3 last:border-0">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-medium text-white text-sm">${m.name} <span class="text-[11px] text-zinc-500">(${m.rank || 'No Rank'}) <b class="text-emerald-500/90 font-normal ml-0.5">${roleLabel}</b></span></span>
-                                <button onclick="removeCrewMember('${m.id}')" class="text-[10px] font-medium text-rose-400 hover:text-rose-300 border border-rose-950 px-2 py-0.5 rounded-md transition-colors bg-rose-950/20">Remove</button>
-                            </div>
-                            <div class="text-xs font-mono text-zinc-500">
-                                <span class="text-rose-400 font-medium">$${Math.floor(wk.dirty).toLocaleString()}</span> dirty &middot; <span class="text-emerald-400 font-medium">$${Math.floor(wk.clean).toLocaleString()}</span> clean
-                            </div>
-                        </div>`;
-                });
-            }
-
-            const totalsContainer = document.getElementById('all-time-totals-list'); if(totalsContainer) {
-                totalsContainer.innerHTML = '';
-                Object.entries(displayStats).forEach(([name, data]) => {
-                    if(currentUserRole !== 'admin' && name.toLowerCase() !== currentUserName.toLowerCase()) return;
-                    totalsContainer.innerHTML += `
-                        <div class="pt-3 first:pt-0">
-                            <h4 class="text-xs font-semibold uppercase text-zinc-400 mb-1.5">${name}</h4>
-                            <div class="space-y-1 text-xs font-mono">
-                                <div class="flex justify-between"><span class="text-zinc-500">Dirty in</span><span class="text-rose-400 font-medium">$${Math.floor(data.dirty).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span class="text-zinc-500">Org cut</span><span class="text-amber-500/90 font-medium">$${Math.floor(data.fee).toLocaleString()}</span></div>
-                                <div class="flex justify-between"><span class="text-zinc-500">Clean out</span><span class="text-emerald-400 font-medium">$${Math.floor(data.clean).toLocaleString()}</span></div>
-                            </div>
-                        </div>`;
-                });
-            }
-
-            const historyBody = document.getElementById('history-table-body'); if(historyBody) {
-                historyBody.innerHTML = '';
-                const filteredTx = currentUserRole === 'admin' ? cachedTransactions : cachedTransactions.filter(t => t.username.toLowerCase() === currentUserName.toLowerCase());
-                filteredTx.forEach(t => {
-                    historyBody.innerHTML += `
-                        <tr class="hover:bg-zinc-900/30 border-b border-zinc-800/40 transition-colors">
-                            <td class="py-3 px-2 text-zinc-300 font-semibold">${t.username}</td>
-                            <td class="py-3 px-2 text-zinc-500 font-medium whitespace-nowrap">${t.week || 'Unknown Week'}</td>
-                            <td class="py-3 px-2 text-right text-rose-400 font-mono font-medium">$${Math.floor(t.dirty).toLocaleString()}</td>
-                            <td class="py-3 px-2 text-right text-amber-500/90 font-mono">$${Math.floor(t.fee).toLocaleString()} <span class="text-[10px] text-zinc-600">(${t.rateUsed}%)</span></td>
-                            <td class="py-3 px-2 text-right text-emerald-400 font-mono font-semibold">$${Math.floor(t.clean).toLocaleString()}</td>
-                            <td class="py-3 px-2 text-right text-zinc-500 font-mono text-[11px]">${t.loggedBy || 'System'}</td>
-                            <td class="py-3 px-2 text-center ${currentUserRole !== 'admin' ? 'hidden' : ''}"><button onclick="deleteTransaction('${t.id}')" class="text-zinc-600 hover:text-rose-400 font-sans text-base transition-colors">&times;</button></td>
-                        </tr>`;
-                });
-            }
-
-            const leaderboardBody = document.getElementById('leaderboard-table-body'); if(leaderboardBody) {
-                leaderboardBody.innerHTML = '';
-                const sortedRankings = Object.entries(displayStats).sort((a,b) => b[1].dirty - a[1].dirty);
-                sortedRankings.forEach(([name, data], i) => {
-                    let medal = `${i+1}`;
-                    if(i === 0) medal = '🥇'; if(i === 1) medal = '🥈'; if(i === 2) medal = '🥉';
-                    leaderboardBody.innerHTML += `
-                        <tr class="hover:bg-zinc-900/20 border-b border-zinc-800/40 transition-colors">
-                            <td class="py-3 font-semibold text-center text-xs">${medal}</td>
-                            <td class="py-3 font-semibold text-zinc-200 text-sm">${name}</td>
-                            <td class="py-3 text-right text-rose-400 font-mono font-medium">$${Math.floor(data.dirty).toLocaleString()}</td>
-                            <td class="py-3 text-right text-emerald-400 font-mono font-medium">$${Math.floor(data.clean).toLocaleString()}</td>
-                        </tr>`;
-                });
-            }
-
-            const suppliesBody = document.getElementById('supplies-table-body'); if(suppliesBody) {
-                suppliesBody.innerHTML = '';
-                cachedSupplies.forEach(s => {
-                    suppliesBody.innerHTML += `
-                        <tr class="hover:bg-zinc-900/20 transition-colors">
-                            <td class="py-3 text-zinc-300 uppercase font-semibold text-xs tracking-wide">${s.name}</td>
-                            <td class="py-3 text-center text-amber-400 font-mono font-medium text-sm">${s.count}</td>
-                            <td class="py-3 text-center ${currentUserRole !== 'admin' ? 'hidden' : ''}"><button onclick="deleteSupplyItem('${s.id}')" class="text-zinc-600 hover:text-rose-400 font-sans text-base transition-colors">&times;</button></td>
-                        </tr>`;
-                });
-                if(cachedSupplies.length === 0) suppliesBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-zinc-600 italic">No supply items in base inventory.</td></tr>`;
-            }
-
-            const auditSubTxContainer = document.getElementById('audit-sub-transactions');
-            if(auditSubTxContainer) {
-                auditSubTxContainer.innerHTML = '';
-                cachedTransactions.forEach(t => {
-                    auditSubTxContainer.innerHTML += `
-                        <div class="bg-zinc-900/30 p-2.5 rounded-lg border border-zinc-800/80 text-[11px] font-mono">
-                            <div class="flex justify-between text-zinc-500 mb-1">
-                                <span>Target: <b class="text-white font-medium">${t.username}</b></span>
-                                <span class="text-zinc-600 text-[10px]">${t.week.split('—')[0].trim()}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Amt: <b class="text-rose-400">$${t.dirty}</b> &rarr; <b class="text-emerald-400">$${Math.floor(t.clean)}</b></span>
-                                <span class="text-orange-400/90">By: ${t.loggedBy || 'System'}</span>
-                            </div>
-                        </div>`;
-                });
-                if(cachedTransactions.length === 0) auditSubTxContainer.innerHTML = `<p class="text-zinc-600 text-[11px] italic p-2">No dirty washes registered.</p>`;
-            }
-
-            const auditSubFinesContainer = document.getElementById('audit-sub-fines');
-            if(auditSubFinesContainer) {
-                auditSubFinesContainer.innerHTML = '';
-                cachedFines.forEach(f => {
-                    auditSubFinesContainer.innerHTML += `
-                        <div class="bg-zinc-900/30 p-2.5 rounded-lg border border-zinc-800/80 text-[11px] font-mono">
-                            <div class="flex justify-between text-zinc-500 mb-1">
-                                <span>Target: <b class="text-white font-medium">${f.username}</b></span>
-                                <span class="text-rose-400 font-medium">$${f.amount}</span>
-                            </div>
-                            <p class="text-zinc-400 font-sans text-[11px] leading-tight my-1.5">${f.reason}</p>
-                            <div class="text-right text-[10px]">
-                                <span class="text-orange-400/90">Issued By: ${f.issuedBy || 'System'}</span>
-                            </div>
-                        </div>`;
-                });
-                if(cachedFines.length === 0) auditSubFinesContainer.innerHTML = `<p class="text-zinc-600 text-[11px] italic p-2">No custom fines active.</p>`;
-            }
-
-            if(currentUserRole === 'admin' || currentUserPerms.canManageRoles) {
-                const badgesBox = document.getElementById('ranks-badges-list'); if(badgesBox) {
-                    badgesBox.innerHTML = '';
-                    cachedRanks.forEach(r => {
-                        badgesBox.innerHTML += `<span class="inline-flex items-center gap-1 bg-zinc-950 border text-[11px] px-2.5 py-0.5 rounded-md font-medium uppercase tracking-wider" style="color: ${r.color}; border-color: ${r.color}33">${r.name}<button onclick="removeCustomRank('${r.id}')" class="text-zinc-600 hover:text-rose-400 ml-1 font-sans text-xs">&times;</button></span>`;
-                    });
-                }
-
-                const hierarchyBody = document.getElementById('hierarchy-table-body'); if(hierarchyBody) {
-                    hierarchyBody.innerHTML = '';
-                    cachedMembers.forEach(m => {
-                        let rOpts = `<option value="">-- No Rank --</option>`;
-                        cachedRanks.forEach(r => rOpts += `<option value="${r.name}" ${m.rank === r.name ? 'selected' : ''}>${r.name.toUpperCase()}</option>`);
-                        let sOpts = `<option value="">-- No Supervisor --</option>`;
-                        cachedMembers.forEach(o => { if(o.name !== m.name) sOpts += `<option value="${o.name}" ${m.worksUnder === o.name ? 'selected' : ''}>${o.name}</option>`; });
-
-                        hierarchyBody.innerHTML += `
-                            <tr class="hover:bg-zinc-900/10">
-                                <td class="py-3 font-semibold text-white text-sm">${m.name}</td>
-                                <td class="py-3 px-1"><select onchange="updateMemberRank('${m.id}', this.value)" class="bg-zinc-900 border border-zinc-800 rounded-md p-1.5 text-xs text-zinc-400 w-32 uppercase focus:outline-none focus:border-emerald-500">${rOpts}</select></td>
-                                <td class="py-3 px-1">
-                                    <input type="text" value="${m.role || ''}" placeholder="e.g. Driver" onchange="updateMemberRole('${m.id}', this.value)" class="bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-md px-2 py-1.5 text-xs w-28 focus:outline-none focus:border-emerald-500">
-                                </td>
-                                <td class="py-3 px-1"><select onchange="updateMemberSupervisor('${m.id}', this.value)" class="bg-zinc-900 border border-zinc-800 rounded-md p-1.5 text-xs text-zinc-400 w-32 focus:outline-none focus:border-emerald-500">${sOpts}</select></td>
-                                <td class="py-3 px-1 text-zinc-500 text-xs">${cachedMembers.filter(sub => sub.worksUnder === m.name).map(s => s.name).join(', ') || 'None'}</td>
-                            </tr>`;
-                    });
-                }
-            }
-
-            if(currentUserRole === 'admin') {
-                const adminUsersBody = document.getElementById('admin-users-table'); if(adminUsersBody) {
-                    adminUsersBody.innerHTML = '';
-                    cachedMembers.forEach(m => {
-                        const vd = m.viewDash !== false ? 'checked' : ''; const vw = m.viewWeeklies !== false ? 'checked' : '';
-                        const vf = m.viewFines !== false ? 'checked' : ''; const clw = m.canLogWashes === true ? 'checked' : '';
-                        const cmr = m.canManageRoles === true ? 'checked' : ''; const cm = m.canModify === true ? 'checked' : '';
-
-                        adminUsersBody.innerHTML += `
-                            <tr class="border-b border-zinc-800/40 hover:bg-zinc-900/10 transition-colors">
-                                <td class="py-3.5 font-semibold text-white text-xs">${m.name}</td>
-                                <td class="py-3.5 px-2">
-                                    <input type="text" value="${m.password || ''}" onchange="updateMemberPassword('${m.id}', this.value)" class="bg-zinc-900 border border-zinc-800 text-emerald-400 font-mono font-medium px-2 py-1 rounded-md text-xs w-32 focus:outline-none focus:border-emerald-500">
-                                </td>
-                                <td class="py-3.5 text-center"><input type="checkbox" ${vd} onchange="updateMemberPermission('${m.id}', 'viewDash', this.checked)" class="custom-checkbox"></td>
-                                <td class="py-3.5 text-center"><input type="checkbox" ${vw} onchange="updateMemberPermission('${m.id}', 'viewWeeklies', this.checked)" class="custom-checkbox"></td>
-                                <td class="py-3.5 text-center"><input type="checkbox" ${vf} onchange="updateMemberPermission('${m.id}', 'viewFines', this.checked)" class="custom-checkbox"></td>
-                                <td class="py-3.5 text-center"><input type="checkbox" ${clw} onchange="updateMemberPermission('${m.id}', 'canLogWashes', this.checked)" class="custom-checkbox"></td>
-                                <td class="py-3.5 text-center"><input type="checkbox" ${cmr} onchange="updateMemberPermission('${m.id}', 'canManageRoles', this.checked)" class="custom-checkbox"></td>
-                                <td class="py-3.5 text-center"><input type="checkbox" ${cm} onchange="updateMemberPermission('${m.id}', 'canModify', this.checked)" class="custom-checkbox"></td>
-                            </tr>`;
-                    });
-                }
-            }
-
-            updateVisualLabelsText();
-            const weekliesBody = document.getElementById('weeklies-table-body'); if(weekliesBody) {
-                weekliesBody.innerHTML = '';
-                const filteredMembers = currentUserRole === 'admin' ? cachedMembers : cachedMembers.filter(m => m.name.toLowerCase() === currentUserName.toLowerCase());
-                
-                filteredMembers.forEach(m => {
-                    const docId = `${m.name}_${currentWeekFilter}`.replace(/[\/\s—→]/g, "_");
-                    const status = cachedWeeklyStatus[docId] || { check1: false, check2: false, check3: false };
-                    const blockWrite = (currentUserRole !== 'admin' && !currentUserPerms.canModify) ? 'disabled' : '';
-                    const blockFeeEdit = currentUserRole !== 'admin' ? 'disabled' : '';
-
-                    weekliesBody.innerHTML += `
-                        <tr class="hover:bg-zinc-900/10 transition-colors">
-                            <td class="py-4 font-semibold text-white text-sm">${m.name}</td>
-                            <td class="py-4 px-2 text-zinc-400 font-normal italic">${m.role || 'Unassigned'}</td>
-                            <td class="py-4 px-2">
-                                <div class="flex items-center bg-zinc-900/60 border border-zinc-800 px-2.5 py-1 rounded-md w-28">
-                                    <span class="text-zinc-600 font-medium text-xs">$</span>
-                                    <input type="number" value="${m.weeklyFee || 0}" onchange="updateMemberFee('${m.id}', this.value)" class="w-full bg-transparent text-white font-medium text-xs outline-none ml-0.5" ${blockFeeEdit}>
-                                </div>
-                            </td>
-                            <td class="py-4 px-2 text-center"><input type="checkbox" ${status.check1 ? 'checked' : ''} onchange="toggleWeeklyCheck('${m.name}', 1, this.checked)" class="custom-checkbox" ${blockWrite}></td>
-                            <td class="py-4 px-2 text-center"><input type="checkbox" ${status.check2 ? 'checked' : ''} onchange="toggleWeeklyCheck('${m.name}', 2, this.checked)" class="custom-checkbox" ${blockWrite}></td>
-                            <td class="py-4 px-2 text-center"><input type="checkbox" ${status.check3 ? 'checked' : ''} onchange="toggleWeeklyCheck('${m.name}', 3, this.checked)" class="custom-checkbox" ${blockWrite}></td>
-                        </tr>`;
-                });
-            }
-
-            const finesBody = document.getElementById('fines-table-body'); if(finesBody) {
-                finesBody.innerHTML = '';
-                const filteredFines = currentUserRole === 'admin' ? cachedFines.filter(f => f.week === currentWeekFilter) : cachedFines.filter(f => f.week === currentWeekFilter && f.username.toLowerCase() === currentUserName.toLowerCase());
-                
-                if(filteredFines.length > 0) {
-                    filteredFines.forEach(f => {
-                        const blockWrite = (currentUserRole !== 'admin' && !currentUserPerms.canModify) ? 'disabled' : '';
-                        finesBody.innerHTML += `
-                            <tr class="border-b border-zinc-800/40 hover:bg-zinc-900/10 transition-colors">
-                                <td class="py-3 px-1 font-semibold text-zinc-300 text-xs">${f.username}</td>
-                                <td class="py-3 px-2 text-zinc-400 font-normal text-[12px] leading-relaxed max-w-xs">${f.reason}</td>
-                                <td class="py-3 px-2 text-right text-rose-400 font-mono font-medium">$${f.amount.toLocaleString()}</td>
-                                <td class="py-3 px-2 text-right text-zinc-500 font-mono text-[11px]">${f.issuedBy || 'System'}</td>
-                                <td class="py-3 px-2 text-center"><input type="checkbox" ${f.paid ? 'checked' : ''} onchange="toggleFinePaid('${f.id}', this.checked)" class="custom-checkbox" ${blockWrite}></td>
-                                <td class="py-3 px-2 text-center ${currentUserRole !== 'admin' ? 'hidden' : ''}"><button onclick="deleteFine('${f.id}')" class="text-zinc-600 hover:text-rose-400 font-sans text-base transition-colors">&times;</button></td>
-                            </tr>`;
-                    });
-                } else {
-                    finesBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-zinc-500 text-xs italic">No active citations linked to this target cycle.</td></tr>`;
-                }
+                const defaultTab = document.getElementById('dashboard-tab');
+                if (defaultTab) defaultTab.classList.remove('hidden');
             }
         }
 
-        document.getElementById('login-password').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAccessKey(); });
-        document.getElementById('wash-week-dropdown').addEventListener('change', rebuildDashboardUI);
-        bindLiveStreams();
+        // Expose function globally for logouts and cross-compatibility layouts
+        window.logOutSession = () => {
+            location.reload();
+        };
     </script>
-</body>
-</html>
+</body></html>
